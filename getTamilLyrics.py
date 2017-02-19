@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 
 import luigi
 import time,sys,json,os
@@ -30,6 +32,31 @@ class GetLyricsByLetter(luigi.Task):
 		film_prefix_list = [alpha for alpha in string.lowercase]
 		print "Run this"
 
+class GetSongLyrics(luigi.Task):
+
+	date = luigi.DateParameter()
+
+	def requires(self):
+		return GetMoviesByLetter(self.date)
+
+	def run(self):
+		movie_info = {}
+		#pickle_file = output_folder+'/movie_name_urls_{}.p'.format(self.date)
+		film_prefix_list = ['http://www.paadalvarigal.com/1915/tharai-erangiya-eeram-song-lyrics.html']
+		for film_alpha in film_prefix_list:
+			url = film_alpha
+			response = requests.get(url)
+			soup = BeautifulSoup(response.text,"html5lib")
+			divcenter = soup.findAll('div',{"class":"entry clearfix"})
+			header = soup.findAll('header',{"class":"post-header"})
+			for head in header:
+				print head
+			for div in divcenter:
+				print div.text
+		return True
+
+	def output(self):
+		return luigi.LocalTarget(path=output_folder+'/eeram')
 
 class GetMoviesInformation(luigi.Task):
 
@@ -40,7 +67,7 @@ class GetMoviesInformation(luigi.Task):
 		return GetMoviesByLetter(self.date)
 
 	def run(self):
-		movie_urls = {}
+		movie_info = {}
 		#pickle_file = output_folder+'/movie_name_urls_{}.p'.format(self.date)
 		film_prefix_list = ['http://www.paadalvarigal.com/v-films/villu']
 		for film_alpha in film_prefix_list:
@@ -49,8 +76,19 @@ class GetMoviesInformation(luigi.Task):
 			soup = BeautifulSoup(response.text,"html5lib")
 			divcenter = soup.findAll('div',{"class":"entry clearfix"})
 			for div in divcenter:
-				for table in div.findAll('table'):
-					print table
+				td_list = [ tr.findAll('td') for table in div.findAll('table') for tr in table.findAll('tr')]
+				for td in td_list:
+					print td
+					#print BeautifulSoup(tr,"lxml").findAll('tr')
+#				print [td for td in BeautifulSoup(tr_list).findAll('td')]
+		#				movie_info['MusicDirector']=
+	#					movie_info['Actors']=
+	#					movie_info['Director']=
+#						movie_info['Producer']=
+						#movie_info['Writer']=
+						#movie_info['ReleaseDate']=
+						#movie_info['MoreDetails']=
+				print movie_info
 		#		ul = div.findAll('ul')
 	#			for unlist in ul:
 #					for anchr in unlist.findAll('a'):
