@@ -170,4 +170,5 @@ class CheckNewMovies(luigi.Task):
 		print "Run this"
 
 if __name__ == "__main__":
+	#luigi run command
 	luigi.run()
