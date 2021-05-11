@@ -5,6 +5,7 @@ import datetime,httplib,urllib2
 import string,requests
 from bs4 import BeautifulSoup
 import pickle
+import os
 
 
 output_folder = "../../../Data/Lyrics/Tamil"
